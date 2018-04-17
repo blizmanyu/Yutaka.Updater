@@ -1,11 +1,18 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading;
 using NLog;
+using Yutaka.Diagnostics;
 
 namespace Yutaka.Updater
 {
 	class Program
 	{
+		// Config/Settings //
+		private static bool consoleOut = true; // default = false //
+
 		#region Fields
 		#region Static Externs
 		[DllImport("kernel32.dll")]
@@ -16,7 +23,7 @@ namespace Yutaka.Updater
 		#endregion Static Externs
 
 		// Constants //
-		const string PROGRAM_NAME = "Rcw.SqlAntiHack";
+		const string PROGRAM_NAME = "Yutaka.Updater";
 		const string TIMESTAMP = @"[HH:mm:ss] ";
 
 		// PIVs //
@@ -26,23 +33,59 @@ namespace Yutaka.Updater
 		private static int totalCount = 0;
 		private static int errorCountThreshold = 7;
 		private static double errorPerThreshold = 0.07;
+		private static string ninitePath;
 		#endregion Fields
 
-		// Config/Settings //
-		private static bool consoleOut = false; // default = false //
-
 		#region Private Helpers
-		private static void Process()
+		private static void Updater()
 		{
+			var isSkypeRunning = false;
+			var isGreenshotRunning = false;
+			var skypePath = "";
+			var greenshotPath = "";
 
+			var greenshotProc = Process.GetProcessesByName("Greenshot");
+			if (greenshotProc != null && greenshotProc.Length > 0) {
+				isGreenshotRunning = true;
+				var files = Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Greenshot.exe", SearchOption.AllDirectories);
+				greenshotPath = files[0];
+				logger.Info(greenshotPath);
+				ProcessHelper.EndProcessesByName("Greenshot");
+			}
+
+			var skypeProc = Process.GetProcessesByName("Skype");
+			if (skypeProc != null && skypeProc.Length > 0) {
+				isSkypeRunning = true;
+				var files = Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Skype.exe", SearchOption.AllDirectories);
+				skypePath = files[0];
+				logger.Info(skypePath);
+				ProcessHelper.EndProcessesByName("Skype");
+			}
+
+			Process.Start(new ProcessStartInfo("wuapp.exe"));
+			Process.Start(new ProcessStartInfo(ninitePath));
+			Thread.Sleep(7200);
+
+			if (isGreenshotRunning)
+				Process.Start(new ProcessStartInfo(greenshotPath));
+			if (isSkypeRunning)
+				Process.Start(new ProcessStartInfo(skypePath));
 		}
 		#endregion Private Helpers
 
 		#region Methods
 		static void Main(string[] args)
 		{
+			if (args == null || args.Length < 1) {
+				Console.Write("Path to Ninite must be given as a argument.");
+				Console.Write("\n.... Press any key to close the program ....");
+				Console.ReadKey(true);
+				Environment.Exit(0);
+			}
+
+			ninitePath = args[0];
 			StartProgram();
-			Process();
+			Updater();
 			EndProgram();
 		}
 
