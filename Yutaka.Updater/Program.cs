@@ -62,7 +62,13 @@ namespace Yutaka.Updater
 				ProcessHelper.EndProcessesByName("Skype");
 			}
 
-			Process.Start(new ProcessStartInfo("wuapp.exe"));
+			try {
+				Process.Start(new ProcessStartInfo("wuapp.exe"));
+			}
+			catch (Exception ex) {
+				logger.Error("{0}{2}{1}", ex.Message, ex.ToString(), Environment.NewLine);
+			}
+
 			Process.Start(new ProcessStartInfo(ninitePath));
 			Thread.Sleep(120000);
 
