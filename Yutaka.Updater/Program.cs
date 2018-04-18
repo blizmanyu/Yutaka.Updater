@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using NLog;
 using Yutaka.Diagnostics;
+using Yutaka.IO;
 
 namespace Yutaka.Updater
 {
 	class Program
 	{
 		// Config/Settings //
-		private static bool consoleOut = true; // default = false //
+		private static bool consoleOut = false; // default = false //
 
 		#region Fields
 		#region Static Externs
@@ -44,27 +46,25 @@ namespace Yutaka.Updater
 			var skypePath = "";
 			var greenshotPath = "";
 
-			var greenshotProc = Process.GetProcessesByName("Greenshot");
-			if (greenshotProc != null && greenshotProc.Length > 0) {
+			var greenshotProc = Process.GetProcessesByName("Greenshot").FirstOrDefault();
+			if (greenshotProc != null) {
 				isGreenshotRunning = true;
-				var files = Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Greenshot.exe", SearchOption.AllDirectories);
-				greenshotPath = files[0];
+				greenshotPath = greenshotProc.MainModule.FileName;
 				logger.Info(greenshotPath);
 				ProcessHelper.EndProcessesByName("Greenshot");
 			}
 
-			var skypeProc = Process.GetProcessesByName("Skype");
-			if (skypeProc != null && skypeProc.Length > 0) {
+			var skypeProc = Process.GetProcessesByName("Skype").FirstOrDefault();
+			if (skypeProc != null) {
 				isSkypeRunning = true;
-				var files = Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Skype.exe", SearchOption.AllDirectories);
-				skypePath = files[0];
+				skypePath = skypeProc.MainModule.FileName;
 				logger.Info(skypePath);
 				ProcessHelper.EndProcessesByName("Skype");
 			}
 
 			Process.Start(new ProcessStartInfo("wuapp.exe"));
 			Process.Start(new ProcessStartInfo(ninitePath));
-			Thread.Sleep(7200);
+			Thread.Sleep(120000);
 
 			if (isGreenshotRunning)
 				Process.Start(new ProcessStartInfo(greenshotPath));
@@ -116,10 +116,10 @@ namespace Yutaka.Updater
 
 			var totalTime = "";
 			if (ts.TotalHours > .9999)
-				totalTime += String.Format("{0}h ", ts.TotalHours);
+				totalTime += String.Format("{0}h ", ts.Hours);
 			if (ts.TotalMinutes > .9999)
-				totalTime += String.Format("{0}m ", ts.TotalMinutes);
-			totalTime += String.Format("{0}s", ts.TotalSeconds);
+				totalTime += String.Format("{0}m ", ts.Minutes);
+			totalTime += String.Format("{0}.{0:D3}s", ts.Seconds, ts.Milliseconds);
 
 			var log = new string[4];
 			log[0] = "Ending program";

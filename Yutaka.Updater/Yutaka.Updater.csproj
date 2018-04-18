@@ -37,16 +37,17 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>true</Prefer32Bit>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -66,6 +67,9 @@
     <Reference Include="System.Xml" />
     <Reference Include="Yutaka.Diagnostics">
       <HintPath>..\..\Yutaka\Libraries\Yutaka.Diagnostics\bin\Debug\Yutaka.Diagnostics.dll</HintPath>
+    </Reference>
+    <Reference Include="Yutaka.IO">
+      <HintPath>..\..\Yutaka\Libraries\Yutaka.IO\bin\Debug\Yutaka.IO.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
