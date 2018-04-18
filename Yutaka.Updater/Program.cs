@@ -83,10 +83,9 @@ namespace Yutaka.Updater
 		static void Main(string[] args)
 		{
 			if (args == null || args.Length < 1) {
-				Console.Write("Path to Ninite must be given as a argument.");
-				Console.Write("\n.... Press any key to close the program ....");
-				Console.ReadKey(true);
-				Environment.Exit(0);
+				var msg = "Path to Ninite must be given as an argument.";
+				logger.Error(msg);
+				throw new ArgumentNullException(msg);
 			}
 
 			ninitePath = args[0];
