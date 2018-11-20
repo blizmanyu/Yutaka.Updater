@@ -54,6 +54,12 @@ namespace Yutaka.Updater
 				ProcessHelper.EndProcessesByName("Greenshot");
 			}
 
+			var niniteProc = Process.GetProcessesByName("Ninite").FirstOrDefault();
+			if (niniteProc != null) {
+				logger.Info(ninitePath);
+				ProcessHelper.EndProcessesByName("Ninite");
+			}
+
 			var skypeProc = Process.GetProcessesByName("Skype").FirstOrDefault();
 			if (skypeProc != null) {
 				isSkypeRunning = true;
@@ -62,15 +68,22 @@ namespace Yutaka.Updater
 				ProcessHelper.EndProcessesByName("Skype");
 			}
 
+			ProcessHelper.RefreshTrayArea(); // force-refresh system tray to remove icons //
+
 			try {
+				// Start Windows Update //
 				Process.Start(new ProcessStartInfo("wuapp.exe"));
+				// Start Disk Cleanup //
+				var cleanmgr = new ProcessStartInfo("cleanmgr");
+				cleanmgr.Verb = "runas";
+				Process.Start(cleanmgr);
 			}
 			catch (Exception ex) {
 				logger.Error("{0}{2}{1}", ex.Message, ex.ToString(), Environment.NewLine);
 			}
 
 			Process.Start(new ProcessStartInfo(ninitePath));
-			Thread.Sleep(120000);
+			Thread.Sleep(120000); // 2 min //
 
 			if (isGreenshotRunning)
 				Process.Start(new ProcessStartInfo(greenshotPath));
